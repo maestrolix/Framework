@@ -1,9 +1,6 @@
 from organs_framework.base_views import ListView, TemplateView, CreateView
 from organs_framework.decorators import AppRoute
-from organs_framework.base_models import Engine
-
-# Запускаем движок
-data_base = Engine()
+from organs_framework.orm import MapperRegistry
 
 routes = {}
 
@@ -27,14 +24,15 @@ class Registration(CreateView):
     def create_obj(data):
         name = data['name']
         password = data['password']
-        data_base.create('user', name=name, password=password)
+        user_model = MapperRegistry.get_current_mapper('user')
+        user_model.create(name=name, password=password)
 
     def get_context_data(self):
-        return {'users': data_base.users}
+        return {'users': MapperRegistry.get_current_mapper('user').all()}
 
 
 @AppRoute(routes=routes, url='/user-list/')
 class UserList(ListView):
-    queryset = data_base.users
+    queryset = MapperRegistry.get_current_mapper('user').all()
     template_name = 'user-list.html'
     context_object_name = 'users'

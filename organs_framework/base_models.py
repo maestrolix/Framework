@@ -3,13 +3,10 @@ import quopri
 
 
 class BaseUser(ABC):
-    auto_id = 1
 
-    def __init__(self, username, password):
-        self.id = self.__class__.auto_id
-        self.__class__.auto_id += 1
-
-        self.name = username
+    def __init__(self, name, password):
+        self.id = ''
+        self.name = name
         self.password = password
 
     def __str__(self):
@@ -65,39 +62,39 @@ class GroupFactory:
         return cls.types[type_](title)
 
 
-class Engine:
-    """ Класс-Основной интерфейс проекта """
-
-    def __init__(self):
-        self.users = []
-        self.admins = []
-        self.test_groups = []
-        self.publish_groups = []
-
-    def create(self, type_, name, password):
-        new_user = UserFactory.create(type_, name, password)
-        self.users.append(new_user)
-        return self.users
-
-    def find_user_by_id(self, user_id):
-        for user in self.users:
-            print('item', user.id)
-            if user.id == user_id:
-                return user
-        raise Exception(f'Нет пользователя с id = {user_id}')
-
-    @staticmethod
-    def create_group(type_, title):
-        return GroupFactory.create(type_, title)
-
-    def get_group(self, title):
-        for group in self.test_groups:
-            if group.title == title:
-                return group
-        return None
-
-    @staticmethod
-    def decode_value(val):
-        val_b = bytes(val.replace('%', '=').replace("+", " "), 'UTF-8')
-        val_decode_str = quopri.decodestring(val_b)
-        return val_decode_str.decode('UTF-8')
+# class Engine:
+#     """ Класс-Основной интерфейс проекта """
+#
+#     def __init__(self):
+#         self.users = []
+#         self.admins = []
+#         self.test_groups = []
+#         self.publish_groups = []
+#
+#     def create(self, type_, name, password):
+#         new_user = UserFactory.create(type_, name, password)
+#         self.users.append(new_user)
+#         return self.users
+#
+#     def find_user_by_id(self, user_id):
+#         for user in self.users:
+#             print('item', user.id)
+#             if user.id == user_id:
+#                 return user
+#         raise Exception(f'Нет пользователя с id = {user_id}')
+#
+#     @staticmethod
+#     def create_group(type_, title):
+#         return GroupFactory.create(type_, title)
+#
+#     def get_group(self, title):
+#         for group in self.test_groups:
+#             if group.title == title:
+#                 return group
+#         return None
+#
+#     @staticmethod
+#     def decode_value(val):
+#         val_b = bytes(val.replace('%', '=').replace("+", " "), 'UTF-8')
+#         val_decode_str = quopri.decodestring(val_b)
+#         return val_decode_str.decode('UTF-8')

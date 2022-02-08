@@ -10,8 +10,8 @@ from organs_framework.base_models import *
 class UserMapper:
     """ ORM для пользователя """
 
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self, connect):
+        self.connection = connect
         self.cursor = connection.cursor()
         self.db_table = 'user'
 
@@ -35,9 +35,10 @@ class UserMapper:
         else:
             raise RecordNotFoundException(f'record with id={id} not found')
 
-    def insert(self, obj):
-        statement = f'INSERT INTO {self.db_table} (name) VALUES (?)'
-        self.cursor.execute(statement, (obj.name,))
+    def create(self, **kwargs):
+        obj = User(**kwargs)
+        statement = f'INSERT INTO {self.db_table} (name, password) VALUES (?, ?)'
+        self.cursor.execute(statement, (obj.name, obj.password))
         try:
             self.connection.commit()
         except Exception as e:
@@ -69,8 +70,8 @@ class MapperRegistry:
     }
 
     @staticmethod
-    def get_current_mapper(obj):
-        name = str(type(obj).__name__).lower()
+    def get_current_mapper(name):
+        # name = str(type(obj).__name__).lower()
         return MapperRegistry.mapper[name](connection)
 
 
