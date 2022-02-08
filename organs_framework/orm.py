@@ -1,5 +1,5 @@
 import sqlite3
-from organs_framework.Exeptions import \
+from organs_framework.exceptions import \
     RecordNotFoundException, \
     DbCommitException, \
     DbUpdateException, \
