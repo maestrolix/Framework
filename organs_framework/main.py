@@ -15,11 +15,12 @@ class Framework:
     def __call__(self, environ, start_response):
         """ Получаем адрес, по которому пользователь выполнил переход """
         path = environ['PATH_INFO']
+        # print(environ)
 
         # Получаем все данные из запроса
         request = {}
         method = environ['REQUEST_METHOD']
-        request['method'] = method
+        request['method'] = method.upper()
 
         if method == 'POST':
             data = PostRequest(environ).get_request_params()
@@ -27,8 +28,12 @@ class Framework:
             print(f'Нам пришёл POST-запрос: {data}')
         if method == 'GET':
             requests_params = GetRequest(environ).get_request_params()
-            request['request_params'] = requests_params
+            request['params'] = requests_params
             print(f'Нам пришёл GET-запрос: {requests_params}')
+        if method == 'UPDATE':
+            data = PostRequest(environ).get_request_params()
+            request['data'] = data
+            print(f'Нам пришёл POST-запрос: {data}')
 
         # Добавляем закрывающийся слеш, если нет
         if not path.endswith('/'):
@@ -42,7 +47,7 @@ class Framework:
 
         # Запускаем контроллер
         code, body = view(request)
-        start_response(code, [('Content-Type', 'text/html')])
+        start_response(code, [('Content-Type', 'application/json; charset=utf-8')])
         return [body.encode('utf-8')]
 
     @staticmethod

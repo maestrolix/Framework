@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import json
 
 
 class AbstractRequest(ABC):
@@ -33,13 +34,16 @@ class GetRequest(AbstractRequest):
 
 class PostRequest(AbstractRequest):
 
+    @staticmethod
+    def _json_parser(data):
+        return json.loads(data)
+
     def _get_wsgi_input(self) -> bytes:
         # Получаем длину тела
         content_length_data = self.environ.get('CONTENT_LENGTH')
         # Приводим к числовому значению
         content_length = int(content_length_data) if content_length_data else 0
         # Считываем данные, если они есть
-        data = ''
         if content_length > 0:
             data = self.environ['wsgi.input'].read(content_length)
         else:
@@ -53,7 +57,10 @@ class PostRequest(AbstractRequest):
             # Декодируем данные из байтов
             data_str = data.decode(encoding='utf-8')
             # Собираем их в словарь
-            result = self.parse_input_data(data_str)
+            if self.environ['CONTENT_TYPE'] == 'application/json':
+                result = self._json_parser(data_str)
+            else:
+                result = self.parse_input_data(data_str)
 
         return result
 

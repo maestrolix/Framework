@@ -1,60 +1,37 @@
-from organs_framework.templater import render
+import json
 
 
-class TemplateView:
-    template_name = 'template.html'
+class ApiView:
 
-    def get_context_data(self):
-        return {}
+    def get(self, request):
+        pass
 
-    def get_template(self):
-        return self.template_name
+    def post(self, request):
+        pass
 
-    def render_template_with_context(self, code='200 ok'):
-        template_name = self.get_template()
-        context = self.get_context_data()
-        return code, render(template_name, **context)
+    def delete(self, request):
+        pass
 
-    def __call__(self, request):
-        return self.render_template_with_context()
-
-
-class ListView(TemplateView):
-    queryset = []
-    template_name = 'list.html'
-    context_object_name = 'objects_list'
-
-    def get_queryset(self):
-        print(self.queryset)
-        return self.queryset
-
-    def get_context_object_name(self):
-        return self.context_object_name
-
-    def get_context_data(self):
-        queryset = self.get_queryset()
-        context_object_name = self.get_context_object_name()
-        context = {context_object_name: queryset}
-        return context
-
-
-class CreateView(TemplateView):
-    template_name = 'create.html'
-
-    @staticmethod
-    def get_request_data(request):
-        return request['data']
-
-    @staticmethod
-    def create_obj(data):
+    def update(self, request):
         pass
 
     def __call__(self, request):
-        if request['method'] == 'POST':
-            # метод поста
-            data = self.get_request_data(request)
-            self.create_obj(data)
+        if request['method'] == 'GET':
+            return self.get(request)
+        elif request['method'] == 'POST':
+            return self.post(request)
+        elif request['method'] == 'DELETE':
+            return self.delete(request)
+        elif request['method'] == 'UPDATE':
+            return self.update(request)
 
-            return self.render_template_with_context('201 CREATED')
-        else:
-            return super().__call__(request)
+
+def json_response(code, data=None):
+    if type(data) == list:
+        serialize_data = [i.serialize for i in data]
+        return code, str(json.dumps(serialize_data))
+    elif data is None:
+        return code, ''
+    else:
+        serialize_data = data.serialize
+        return code, str(json.dumps(serialize_data))

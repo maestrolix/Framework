@@ -1,0 +1,4 @@
+.idea/
+__pycache__/
+organs_framework/env/
+organs_framework/__pycache__/
